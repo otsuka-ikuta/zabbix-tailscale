@@ -1,0 +1,51 @@
+zabbix_export:
+  version: '6.2'
+  date: '2023-03-20T06:32:25Z'
+  template_groups:
+    -
+      uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    -
+      uuid: 3e3cf591ce784c538124c2a6c521acbd
+      template: 'Tailscale with Agent Active'
+      name: 'Tailscale with Agent Active'
+      groups:
+        -
+          name: Templates
+      items:
+        -
+          uuid: d51f2eb035e04812a4a3f58b1726408d
+          name: 'tailscale keyexpiry'
+          type: ZABBIX_ACTIVE
+          key: tailscale.keyexpiry
+          delay: 1d
+          description: 'Tailscale Key Expiry with Agent of UserParameter'
+          triggers:
+            -
+              uuid: 581f7239b5d743f6b0598fd756b4e710
+              expression: 'last(/Tailscale with Agent Active/tailscale.keyexpiry)<7'
+              name: 'tailscale keyexpiry'
+              priority: AVERAGE
+              description: 'Tailscale Key remain 1-week of expire'
+        -
+          uuid: 2df669065dbe49a29661e9d6b6776e8c
+          name: 'tailscale online'
+          type: ZABBIX_ACTIVE
+          key: tailscale.online
+          description: 'Tailscale Online with Agent of UserParameter'
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'true'
+                - '1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          triggers:
+            -
+              uuid: cd0f5d6a074441b99d9b1edbd6c48aac
+              expression: 'count(/Tailscale with Agent Active/tailscale.online,#2,,"0")>=2'
+              name: 'tailscale down'
+              priority: AVERAGE
+              description: 'Detect off-line of Tailscale'
